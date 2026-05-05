@@ -1,0 +1,92 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          data_structures/                                   │
+│                                                                             │
+│  ┌──────────────┐    ┌─────────────────┐    ┌──────────┐    ┌───────────┐  │
+│  │   Node<T>    │    │  LinkedList<T>  │    │ Stack<T> │    │ Queue<T>  │  │
+│  │──────────────│    │─────────────────│    │──────────│    │───────────│  │
+│  │ + data: T    │◄───│ - head: Node<T> │    │-top:Node │    │-front:Node│  │
+│  │ + next: Node │    │ - tail: Node<T> │    │-size:int │    │-back: Node│  │
+│  └──────────────┘    │ - size: int     │    │──────────│    │-size: int │  │
+│                      │─────────────────│    │+ push()  │    │───────────│  │
+│                      │ + pushBack()    │    │+ pop()   │    │+ enqueue()│  │
+│                      │ + pushFront()   │    │+ peek()  │    │+ dequeue()│  │
+│                      │ + removeAt()    │    │+ isEmpty()    │+ peek()   │  │
+│                      │ + getAt()       │    │+ clear() │    │+ getAt()  │  │
+│                      │ + swap()        │    └──────────┘    │+ removeAt()   │
+│                      │ + clear()       │                    └───────────┘  │
+│                      └─────────────────┘                                   │
+│                                                                             │
+│  ┌─────────────────────────────────┐                                       │
+│  │         SparseMatrix            │                                       │
+│  │─────────────────────────────────│                                       │
+│  │ - rowHeaders: HeaderNode*       │                                       │
+│  │ - colHeaders: HeaderNode*       │                                       │
+│  │ - numRows: int                  │                                       │
+│  │ - numCols: int                  │                                       │
+│  │─────────────────────────────────│                                       │
+│  │ + set(row, col, value)          │                                       │
+│  │ + get(row, col): string         │                                       │
+│  │ + exists(row, col): bool        │                                       │
+│  │ + remove(row, col)              │                                       │
+│  │ + clear()                       │                                       │
+│  └─────────────────────────────────┘                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              classes/                                       │
+│                                                                             │
+│  ┌───────────────────────┐          ┌──────────────────────────────────┐   │
+│  │        Song           │          │             Player               │   │
+│  │───────────────────────│          │──────────────────────────────────│   │
+│  │ + id: int             │          │ - songCatalog: LinkedList<Song>  │   │
+│  │ + name: string        │◄─────────│ - playQueue:   Queue<int>        │   │
+│  │ + artist: string      │          │ - historyStack: Stack<int>       │   │
+│  │ + album: string       │          │ - songIndex:   SparseMatrix*     │   │
+│  │ + year: int           │          │ - currentSong: Song              │   │
+│  │ + duration: int       │          │ - isPlaying:   bool              │   │
+│  │ + path: string        │          │ - shuffleOn:   bool              │   │
+│  │───────────────────────│          │ - repeatMode:  int               │   │
+│  │ + getDurationFormatted│          │ - catalogLoaded: bool            │   │
+│  │ + isValid(): bool     │          │──────────────────────────────────│   │
+│  │ + operator==()        │          │ + init()                         │   │
+│  └───────────────────────┘          │ + togglePlayPause()  [W]         │   │
+│                                     │ + prevTrack()        [Q]         │   │
+│                                     │ + nextTrack()        [E]         │   │
+│                                     │ + toggleShuffle()    [S]         │   │
+│                                     │ + cycleRepeat()      [R]         │   │
+│                                     │ + skipToQueuePosition()[Snum]    │   │
+│                                     │ + playSongFromCatalog()[Rnum]    │   │
+│                                     │ + addSongToQueue()   [Anum]      │   │
+│                                     │ + addSongToCatalog() [N]         │   │
+│                                     │ + removeSongFromCatalog()[Dnum]  │   │
+│                                     │ + saveState()                    │   │
+│                                     └──────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                               core/                                         │
+│                                                                             │
+│  ┌──────────────────────────────┐    ┌──────────────────────────────────┐  │
+│  │        FileManager           │    │            Display               │  │
+│  │──────────────────────────────│    │──────────────────────────────────│  │
+│  │ (todos los métodos son       │    │ (todos los métodos son           │  │
+│  │  static — no necesita        │    │  static — no necesita            │  │
+│  │  instanciarse)               │    │  instanciarse)                   │  │
+│  │──────────────────────────────│    │──────────────────────────────────│  │
+│  │ + loadSongs()                │    │ + clearScreen()                  │  │
+│  │ + saveSongs()                │    │ + buildStatusText()              │  │
+│  │ + getConfigValue()           │    │ + showMainMenu()                 │  │
+│  │ + saveStatus()               │    │ + showPlaylistMenu()             │  │
+│  │ + createDefaultStatus()      │    │ + showCatalogMenu()              │  │
+│  │ + fileExists()               │    │ + showInvalidInput()             │  │
+│  └──────────────────────────────┘    └──────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+RELACIONES:
+  Player  ──usa──►  LinkedList<Song>   (catálogo)
+  Player  ──usa──►  Queue<int>         (cola de reproducción)
+  Player  ──usa──►  Stack<int>         (historial)
+  Player  ──usa──►  SparseMatrix       (índice)
+  Player  ──usa──►  FileManager        (leer/escribir archivos)
+  Display ──usa──►  Player             (leer estado para mostrar)
+  main    ──usa──►  Player + Display   (coordina todo)

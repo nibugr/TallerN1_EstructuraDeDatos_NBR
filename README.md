@@ -1,11 +1,11 @@
 # TallerN1_EstructuraDeDatos_NBR
 # 🎵 MusicPlayer "Ucenin"
 ```
-Estudiante: Nicolás Ignacio Bugueño Rementería 
-RUT: 20.007.300-2
-Carrera: Ingeniería Civil en Computación e informática 
-Asignatura: Estructuras de Datos — 1° Semestre 2026
-Profesor: Bastian Ruiz Garay | Ayudante: Pablo Guzmán Vargas
+*Estudiante: Nicolás Ignacio Bugueño Rementería 
+*RUT: 20.007.300-2
+*Carrera: Ingeniería Civil en Computación e informática 
+*Asignatura: Estructuras de Datos — 1° Semestre 2026
+*Profesor: Bastian Ruiz Garay | Ayudante: Pablo Guzmán Vargas
 ```
 ### Descripción
 MusicPlayer UCN es un reproductor de música por consola desarrollado en C++.

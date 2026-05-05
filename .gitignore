@@ -1,0 +1,43 @@
+# Archivos compilados
+*.o
+*.obj
+*.out
+*.exe
+*.app
+
+# Librerías
+*.so
+*.dll
+*.dylib
+*.a
+
+# Archivos de debug
+*.log
+*.gdb
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Carpetas de build
+build/
+bin/
+Debug/
+Release/
+
+# Archivos de CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Archivos de editores
+.vscode/
+.idea/
+*.swp
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db

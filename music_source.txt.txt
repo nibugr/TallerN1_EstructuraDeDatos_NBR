@@ -1,0 +1,8 @@
+1,Fire Dance,Vivid BAD Squad,Fire Dance (Single),2025,214,music/fire_dance.mp3
+2,PON PON PON,Kyary Pamyu Pamyu,Moshi Moshi Harajuku,2011,218,music/pon_pon_pon.mp3
+3,Crossing field,LiSA,crossing field (Single),2012,267,music/crossing_field.mp3
+4,Show,Ado,Show,2023,196,music/show.mp3
+5,World is Mine,Ryo feat. Hatsune Miku,World is Mine (Single),2008,312,music/world_is_mine.mp3
+6,Bring me to life,Evanescence,Fallen,2003,223,music/bring_me_to_life.mp3
+7,Radioactive,Imagine Dragons,Night Visions,2012,187,music/radioactive.mp3
+8,Titanium,David Guetta,Nothing but the Beat,2011,245,music/titanium.mp3

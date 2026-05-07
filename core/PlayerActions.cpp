@@ -3,47 +3,65 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <vector>
 
-// ---------- fillQueueRandom ----------
+// ---------- fillQueueRandom (sin vector) ----------
 void PlayerActions::fillQueueRandom(Player& player, int excludeId) {
-    // Copiar todas las canciones del catalogo a un vector temporal
-    std::vector<Song> songs;
+    // Contar canciones validas
+    int total = 0;
     Node<Song>* node = player.catalog.getHead();
     while (node != nullptr) {
+        if (node->data.id != excludeId) total++;
+        node = node->next;
+    }
+
+    // Si no hay canciones, salir
+    if (total == 0) return;
+
+    // Crear arreglo dinamico manual
+    Song* songs = new Song[total];
+    int idx = 0;
+    node = player.catalog.getHead();
+    while (node != nullptr) {
         if (node->data.id != excludeId) {
-            songs.push_back(node->data);
+            songs[idx++] = node->data;
         }
         node = node->next;
     }
 
-    // Mezclar el vector con Fisher-Yates
+    // Mezclar con Fisher-Yates
     srand((unsigned int)time(nullptr));
-    for (int i = (int)songs.size() - 1; i > 0; i--) {
+    for (int i = total - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         Song temp = songs[i];
         songs[i] = songs[j];
         songs[j] = temp;
     }
 
-    // Vaciar cola actual y llenarla con las canciones mezcladas
+    // Llenar la cola
     player.playQueue.clear();
-    for (int i = 0; i < (int)songs.size(); i++) {
+    for (int i = 0; i < total; i++) {
         player.playQueue.enqueue(songs[i]);
     }
+
+    // Liberar memoria
+    delete[] songs;
 }
 
-// ---------- shuffleQueue ----------
+// ---------- shuffleQueue (sin vector) ----------
 void PlayerActions::shuffleQueue(Player& player) {
-    // Sacar todo de la cola a un vector
-    std::vector<Song> songs;
+    int total = player.playQueue.getSize();
+    if (total == 0) return;
+
+    // Crear arreglo dinamico manual
+    Song* songs = new Song[total];
+    int idx = 0;
     while (!player.playQueue.isEmpty()) {
-        songs.push_back(player.playQueue.dequeue());
+        songs[idx++] = player.playQueue.dequeue();
     }
 
     // Mezclar
     srand((unsigned int)time(nullptr));
-    for (int i = (int)songs.size() - 1; i > 0; i--) {
+    for (int i = total - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         Song temp = songs[i];
         songs[i] = songs[j];
@@ -51,9 +69,12 @@ void PlayerActions::shuffleQueue(Player& player) {
     }
 
     // Volver a encolar
-    for (int i = 0; i < (int)songs.size(); i++) {
+    for (int i = 0; i < total; i++) {
         player.playQueue.enqueue(songs[i]);
     }
+
+    // Liberar memoria
+    delete[] songs;
 }
 
 // ---------- W: togglePlay ----------
@@ -61,13 +82,11 @@ void PlayerActions::togglePlay(Player& player) {
     if (player.catalog.isEmpty()) return;
 
     if (!player.hasCurrent) {
-        // No hay cancion — seleccionar la primera del catalogo
         player.currentSong = player.catalog.getAt(0);
         player.hasCurrent  = true;
         player.playState   = PLAYING;
         fillQueueRandom(player, player.currentSong.id);
     } else {
-        // Alternar entre PLAYING y PAUSED
         if (player.playState == PLAYING) {
             player.playState = PAUSED;
         } else {
@@ -81,13 +100,10 @@ void PlayerActions::togglePlay(Player& player) {
 void PlayerActions::prevTrack(Player& player) {
     if (player.catalog.isEmpty()) return;
     if (player.history.isEmpty()) return;
-
-    // Si repetir una esta activo, no se cambia de pista
     if (player.repeatMode == REPEAT_ONE) return;
 
-    // La cancion actual vuelve al frente de la cola
+    // Cancion actual vuelve al frente de la cola
     if (player.hasCurrent) {
-        // Crear una cola temporal con la cancion actual al frente
         Queue<Song> tempQueue;
         tempQueue.enqueue(player.currentSong);
         while (!player.playQueue.isEmpty()) {
@@ -98,34 +114,26 @@ void PlayerActions::prevTrack(Player& player) {
         }
     }
 
-    // Sacar la cancion anterior del historial
     player.currentSong = player.history.pop();
     player.hasCurrent  = true;
     player.playState   = PLAYING;
-
     FileManager::saveStatus(player);
 }
 
 // ---------- E: nextTrack ----------
 void PlayerActions::nextTrack(Player& player) {
     if (player.catalog.isEmpty()) return;
-
-    // Si repetir una esta activo, no cambia de pista
     if (player.repeatMode == REPEAT_ONE) return;
 
-    // Guardar cancion actual en historial
     if (player.hasCurrent) {
         player.history.push(player.currentSong);
     }
 
-    // Si la cola esta vacia, rellenar
     if (player.playQueue.isEmpty()) {
         if (player.repeatMode == REPEAT_ALL) {
-            // Rellenar la cola segun modo aleatorio
             if (player.shuffleOn) {
                 fillQueueRandom(player, -1);
             } else {
-                // Orden normal: agregar todas las canciones del catalogo
                 player.playQueue.clear();
                 Node<Song>* node = player.catalog.getHead();
                 while (node != nullptr) {
@@ -134,16 +142,19 @@ void PlayerActions::nextTrack(Player& player) {
                 }
             }
         } else {
-            // Sin repeticion y cola vacia: rellenar aleatoriamente
-            fillQueueRandom(player, player.hasCurrent ? player.currentSong.id : -1);
+            // Cola vacia sin repeticion: rellenar aleatorio
+            // Si solo hay 1 cancion en catalogo, no excluir ninguna
+            int excludeId = -1;
+            if (player.hasCurrent && player.catalog.getSize() > 1) {
+                excludeId = player.currentSong.id;
+            }
+            fillQueueRandom(player, excludeId);
         }
     }
 
-    // Tomar la siguiente cancion de la cola
     player.currentSong = player.playQueue.dequeue();
     player.hasCurrent  = true;
     player.playState   = PLAYING;
-
     FileManager::saveStatus(player);
 }
 
@@ -152,12 +163,9 @@ void PlayerActions::toggleShuffle(Player& player) {
     if (player.catalog.isEmpty()) return;
 
     player.shuffleOn = !player.shuffleOn;
-
-    // Al activar: mezclar la cola actual
     if (player.shuffleOn) {
         shuffleQueue(player);
     }
-
     FileManager::saveStatus(player);
 }
 
@@ -170,45 +178,37 @@ void PlayerActions::cycleRepeat(Player& player) {
         case REPEAT_ONE: player.repeatMode = REPEAT_ALL; break;
         case REPEAT_ALL: player.repeatMode = REPEAT_OFF; break;
     }
-
     FileManager::saveStatus(player);
 }
 
 // ---------- Submenu A: jumpToTrack ----------
 void PlayerActions::jumpToTrack(Player& player, int position) {
-    // position es 1-based
     if (position < 1 || position > player.playQueue.getSize()) {
         Display::showMessage("Posicion invalida.");
         return;
     }
 
-    // Guardar cancion actual en historial
     if (player.hasCurrent) {
         player.history.push(player.currentSong);
     }
 
-    // Descartar canciones hasta llegar a la posicion
     for (int i = 1; i < position; i++) {
-        player.playQueue.dequeue(); // descarta sin guardar
+        player.playQueue.dequeue();
     }
 
-    // La cancion en la posicion indicada es la nueva actual
     player.currentSong = player.playQueue.dequeue();
     player.hasCurrent  = true;
     player.playState   = PLAYING;
-
     FileManager::saveStatus(player);
 }
 
 // ---------- Submenu L: playSongFromCatalog ----------
 void PlayerActions::playSongFromCatalog(Player& player, int position) {
-    // position es 1-based
     if (position < 1 || position > player.catalog.getSize()) {
         Display::showMessage("Posicion invalida.");
         return;
     }
 
-    // Guardar actual en historial
     if (player.hasCurrent) {
         player.history.push(player.currentSong);
     }
@@ -218,8 +218,9 @@ void PlayerActions::playSongFromCatalog(Player& player, int position) {
     player.hasCurrent  = true;
     player.playState   = PLAYING;
 
-    // Llenar cola con el resto aleatoriamente
-    fillQueueRandom(player, chosen.id);
+    // Si solo hay 1 cancion, no excluir ninguna
+    int excludeId = (player.catalog.getSize() > 1) ? chosen.id : -1;
+    fillQueueRandom(player, excludeId);
 
     FileManager::saveStatus(player);
 }
@@ -243,11 +244,13 @@ void PlayerActions::addNewSong(Player& player) {
     Song newSong;
     newSong.id = player.nextId;
 
+    // Limpiar buffer antes de leer
+    std::cin.sync();
+
     std::cout << std::endl;
     std::cout << "=== Agregar nueva cancion ===" << std::endl;
 
     std::cout << "Nombre de la cancion: ";
-    std::cin.ignore();
     std::getline(std::cin, newSong.name);
 
     std::cout << "Nombre del artista: ";
@@ -291,16 +294,14 @@ void PlayerActions::deleteSong(Player& player, int position) {
 
     Song toDelete = player.catalog.getAt(position - 1);
 
-    // Si es la cancion actual, detener reproduccion
     if (player.hasCurrent && player.currentSong.id == toDelete.id) {
-        player.hasCurrent  = false;
-        player.playState   = STOPPED;
+        player.hasCurrent = false;
+        player.playState  = STOPPED;
     }
 
-    // Eliminar del catalogo
     player.catalog.removeAt(position - 1);
 
-    // Eliminar de la cola si estaba ahi
+    // Eliminar de la cola si estaba
     Queue<Song> tempQueue;
     while (!player.playQueue.isEmpty()) {
         Song s = player.playQueue.dequeue();

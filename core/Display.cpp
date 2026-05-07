@@ -148,6 +148,6 @@ void Display::showCatalogMenu(const Player& player) {
 void Display::showMessage(const std::string& msg) {
     std::cout << std::endl << "[!] " << msg << std::endl;
     std::cout << "Presione Enter para continuar...";
-    std::cin.ignore();
+    std::cin.sync();
     std::cin.get();
 }

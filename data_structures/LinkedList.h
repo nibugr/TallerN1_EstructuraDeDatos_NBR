@@ -14,15 +14,15 @@ public:
     LinkedList();
     ~LinkedList();
 
-    void pushBack(T value);       // Agregar al final
-    void pushFront(T value);      // Agregar al inicio
-    bool removeAt(int index);     // Eliminar por posicion
-    T getAt(int index);           // Obtener elemento por posicion
-    int getSize() const;                // Retorna cantidad de elementos
-    bool isEmpty() const;               // Verifica si está vacía
-    void clear();                 // Vaciar la lista
-    void print();                 // Mostrar contenido (debug)
-    Node<T>* getHead() const;           // Acceder al nodo inicial
+    void pushBack(T value);        // Agregar al final
+    void pushFront(T value);       // Agregar al inicio
+    bool removeAt(int index);      // Eliminar por posicion
+    T getAt(int index);            // Obtener elemento por posicion
+    int getSize() const;           // Retorna cantidad de elementos
+    bool isEmpty() const;          // Verifica si esta vacia
+    void clear();                  // Vaciar la lista
+    void print();                  // Mostrar contenido (debug)
+    Node<T>* getHead() const;      // Acceder al nodo inicial
 };
 
 // --- IMPLEMENTACION INLINE (necesario para templates) ---
@@ -81,6 +81,8 @@ bool LinkedList<T>::removeAt(int index) {
 
 template <typename T>
 T LinkedList<T>::getAt(int index) {
+    // Validacion de rango
+    if (index < 0 || index >= size || head == nullptr) return T();
     Node<T>* current = head;
     for (int i = 0; i < index; i++) {
         current = current->next;
